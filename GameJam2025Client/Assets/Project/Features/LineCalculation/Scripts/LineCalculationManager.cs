@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Project.Core.Scripts;
 using UnityEngine;
 
-namespace Project.Features.LineCalculation
+namespace Project.Features.LineCalculation.Scripts
 {
     public class LineCalculationManager : SingletonBehaviour<LineCalculationManager>
     {

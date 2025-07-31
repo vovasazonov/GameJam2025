@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using Project.Core.Scripts;
 using Project.Features.Input.Scripts;
 using Project.Features.LineCalculation;
+using Project.Features.LineCalculation.Scripts;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Object = UnityEngine.Object;
 
 [RequireComponent(typeof(LineRenderer))]
 public class PaintManager : SingletonBehaviour<PaintManager>
@@ -40,6 +42,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
         }
     }
 
+    private List<GameObject> _intersectingObjects = new();
     private void UpdateDrawnLoops()
     {
         CurrentPoints.Clear();
@@ -51,7 +54,15 @@ public class PaintManager : SingletonBehaviour<PaintManager>
 
         var points = CurrentPoints;
         LineCalculationManager.Instance.AddIntersectionsToLine(ref points);
-        
+
+        _intersectingObjects.ForEach(Object.Destroy);
+        _intersectingObjects.Clear();
+        foreach (var point in LineCalculationManager.Instance.FindIntersections(points))
+        {
+            var obj = new GameObject();
+            obj.transform.position = point;
+            _intersectingObjects.Add(obj);
+        }
         PointsUpdated?.Invoke();
     }
 
