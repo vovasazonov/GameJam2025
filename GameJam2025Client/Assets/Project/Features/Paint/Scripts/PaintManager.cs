@@ -14,7 +14,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
     private bool _hasPreviousInput;
     private InputAction _pointAction;
 
-    public List<Vector2> CurrentPoint { get; private set; } = new();
+    public List<Vector2> CurrentPoints { get; private set; } = new();
 
     private void Start()
     {
@@ -31,21 +31,28 @@ public class PaintManager : SingletonBehaviour<PaintManager>
         {
             if (_hasPreviousInput)
             {
-                UpdateDrawnLoops();
+                _hasPreviousInput = false;
+                OnStopPaint();
             }
-
-            _hasPreviousInput = false;
         }
     }
 
     private void UpdateDrawnLoops()
     {
-        CurrentPoint.Clear();
+        CurrentPoints.Clear();
         for (var i = 0; i < _lineRenderer.positionCount; i++)
         {
             var point = _lineRenderer.GetPosition(i);
-            CurrentPoint.Add(new Vector2(point.x, point.y));
+            CurrentPoints.Add(new Vector2(point.x, point.y));
         }
+
+        if (CurrentPoints.Count > 0)
+        {
+            _lineRenderer.positionCount++;
+            _lineRenderer.SetPosition(_lineRenderer.positionCount - 1, CurrentPoints[0]);
+        }
+        
+        // TODO: detect intersection points and put there in CurrentPoint list
     }
 
     private void Draw()
@@ -70,7 +77,20 @@ public class PaintManager : SingletonBehaviour<PaintManager>
             _lineRenderer.positionCount = 1;
             _lineRenderer.SetPosition(_lineRenderer.positionCount - 1, currentPosition);
             _previousPosition = currentPosition;
+            
             _hasPreviousInput = true;
+            OnStartPaint();
         }
+    }
+
+    private void OnStartPaint()
+    {
+        _lineRenderer.loop = false;
+    }
+
+    private void OnStopPaint()
+    {
+        _lineRenderer.loop = true;
+        UpdateDrawnLoops();
     }
 }
