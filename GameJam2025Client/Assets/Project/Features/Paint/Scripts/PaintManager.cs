@@ -46,17 +46,8 @@ public class PaintManager : SingletonBehaviour<PaintManager>
             CurrentPoints.Add(new Vector2(point.x, point.y));
         }
 
-        if (CurrentPoints.Count > 0)
-        {
-            _lineRenderer.positionCount++;
-            _lineRenderer.SetPosition(_lineRenderer.positionCount - 1, CurrentPoints[0]);
-        }
-
-        foreach (var point in FindIntersections(CurrentPoints))
-        {
-            Debug.Log(point);
-        }
-        // TODO: detect intersection points and put there in CurrentPoint list
+        var points = CurrentPoints;
+        AddIntersectionsToLine(ref points);
     }
 
     private void Draw()
@@ -96,6 +87,46 @@ public class PaintManager : SingletonBehaviour<PaintManager>
     {
         _lineRenderer.loop = true;
         UpdateDrawnLoops();
+    }
+    
+    private void AddIntersectionsToLine(ref List<Vector2> points)
+    {
+        // Store intersections to insert after main loop
+        List<(int insertIndex, Vector2 point)> intersectionsToInsert = new();
+
+        for (int i = 0; i < points.Count - 1; i++)
+        {
+            Vector2 a1 = points[i];
+            Vector2 a2 = points[i + 1];
+
+            for (int j = i + 2; j < points.Count - 1; j++)
+            {
+                if (j == i || j == i + 1)
+                    continue;
+
+                Vector2 b1 = points[j];
+                Vector2 b2 = points[j + 1];
+
+                if (LineSegmentsIntersect(a1, a2, b1, b2, out Vector2 intersection))
+                {
+                    // Insert after a1-a2 and b1-b2
+                    intersectionsToInsert.Add((i + 1, intersection));
+                    intersectionsToInsert.Add((j + 1, intersection));
+                }
+            }
+        }
+
+        // Sort insertions in reverse order so index stays valid
+        intersectionsToInsert.Sort((a, b) => b.insertIndex.CompareTo(a.insertIndex));
+
+        foreach (var (index, point) in intersectionsToInsert)
+        {
+            points.Insert(index, point);
+            
+            // DEBUG
+            var obj = new GameObject();
+            obj.transform.position = new Vector3(point.x, point.y, 0);
+        }
     }
     
     private List<Vector2> FindIntersections(List<Vector2> points)
