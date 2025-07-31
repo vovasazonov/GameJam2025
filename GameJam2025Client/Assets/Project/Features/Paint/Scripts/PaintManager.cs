@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Project.Core.Scripts;
 using Project.Features.Input.Scripts;
-using Project.Features.LineCalculation;
 using Project.Features.LineCalculation.Scripts;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,6 +11,8 @@ using Object = UnityEngine.Object;
 public class PaintManager : SingletonBehaviour<PaintManager>
 {
     [SerializeField] private float _minDistanceBetweenPoints = 0.1f;
+    [SerializeField] private GameObject _intersectionPrefab;
+    [SerializeField] private bool _shouldDrawIntersections;
 
     private LineRenderer _lineRenderer;
     private Vector2 _previousPosition;
@@ -42,7 +43,8 @@ public class PaintManager : SingletonBehaviour<PaintManager>
         }
     }
 
-    private List<GameObject> _intersectingObjects = new();
+    private readonly List<GameObject> _intersectingObjects = new();
+
     private void UpdateDrawnLoops()
     {
         CurrentPoints.Clear();
@@ -55,15 +57,22 @@ public class PaintManager : SingletonBehaviour<PaintManager>
         var points = CurrentPoints;
         LineCalculationManager.Instance.AddIntersectionsToLine(ref points);
 
-        _intersectingObjects.ForEach(Object.Destroy);
-        _intersectingObjects.Clear();
-        foreach (var point in LineCalculationManager.Instance.FindIntersections(points))
-        {
-            var obj = new GameObject();
-            obj.transform.position = point;
-            _intersectingObjects.Add(obj);
-        }
         PointsUpdated?.Invoke();
+    }
+
+    private void DrawIntersections()
+    {
+        if (_shouldDrawIntersections)
+        {
+            _intersectingObjects.ForEach(Object.Destroy);
+            _intersectingObjects.Clear();
+            foreach (var point in LineCalculationManager.Instance.FindIntersections(CurrentPoints))
+            {
+                var obj = Object.Instantiate(_intersectionPrefab);
+                obj.transform.position = point;
+                _intersectingObjects.Add(obj);
+            }
+        }
     }
 
     private void Draw()
@@ -97,11 +106,15 @@ public class PaintManager : SingletonBehaviour<PaintManager>
     private void OnStartPaint()
     {
         _lineRenderer.loop = false;
+        
+        _intersectingObjects.ForEach(Object.Destroy);
+        _intersectingObjects.Clear();
     }
 
     private void OnStopPaint()
     {
         _lineRenderer.loop = true;
         UpdateDrawnLoops();
+        DrawIntersections();
     }
 }
