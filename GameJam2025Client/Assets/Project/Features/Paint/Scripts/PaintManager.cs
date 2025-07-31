@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Project.Core.Scripts;
 using Project.Features.Input.Scripts;
+using Project.Features.LineCalculation;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,7 +16,8 @@ public class PaintManager : SingletonBehaviour<PaintManager>
     private bool _hasPreviousInput;
     private InputAction _pointAction;
 
-    public List<Vector2> CurrentPoints { get; private set; } = new();
+    public event Action PointsUpdated;
+    public List<Vector2> CurrentPoints { get; } = new();
 
     private void Start()
     {
@@ -47,13 +50,15 @@ public class PaintManager : SingletonBehaviour<PaintManager>
         }
 
         var points = CurrentPoints;
-        AddIntersectionsToLine(ref points);
+        LineCalculationManager.Instance.AddIntersectionsToLine(ref points);
+        
+        PointsUpdated?.Invoke();
     }
 
     private void Draw()
     {
         var input = InputManager.Instance.PointPosition;
-        
+
         var cameraZ = -1 * Camera.main.transform.position.z;
         var currentPosition = Camera.main.ScreenToWorldPoint(new Vector3(input.x, input.y, cameraZ));
         currentPosition.z = 0;
@@ -72,7 +77,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
             _lineRenderer.positionCount = 1;
             _lineRenderer.SetPosition(_lineRenderer.positionCount - 1, currentPosition);
             _previousPosition = currentPosition;
-            
+
             _hasPreviousInput = true;
             OnStartPaint();
         }
@@ -87,108 +92,5 @@ public class PaintManager : SingletonBehaviour<PaintManager>
     {
         _lineRenderer.loop = true;
         UpdateDrawnLoops();
-    }
-    
-    private void AddIntersectionsToLine(ref List<Vector2> points)
-    {
-        // Store intersections to insert after main loop
-        List<(int insertIndex, Vector2 point)> intersectionsToInsert = new();
-
-        for (int i = 0; i < points.Count - 1; i++)
-        {
-            Vector2 a1 = points[i];
-            Vector2 a2 = points[i + 1];
-
-            for (int j = i + 2; j < points.Count - 1; j++)
-            {
-                if (j == i || j == i + 1)
-                    continue;
-
-                Vector2 b1 = points[j];
-                Vector2 b2 = points[j + 1];
-
-                if (LineSegmentsIntersect(a1, a2, b1, b2, out Vector2 intersection))
-                {
-                    // Insert after a1-a2 and b1-b2
-                    intersectionsToInsert.Add((i + 1, intersection));
-                    intersectionsToInsert.Add((j + 1, intersection));
-                }
-            }
-        }
-
-        // Sort insertions in reverse order so index stays valid
-        intersectionsToInsert.Sort((a, b) => b.insertIndex.CompareTo(a.insertIndex));
-
-        foreach (var (index, point) in intersectionsToInsert)
-        {
-            points.Insert(index, point);
-            
-            // DEBUG
-            var obj = new GameObject();
-            obj.transform.position = new Vector3(point.x, point.y, 0);
-        }
-    }
-    
-    private List<Vector2> FindIntersections(List<Vector2> points)
-    {
-        List<Vector2> intersections = new();
-
-        for (int i = 0; i < points.Count - 1; i++)
-        {
-            Vector2 a1 = points[i];
-            Vector2 a2 = points[i + 1];
-
-            for (int j = i + 2; j < points.Count - 1; j++)
-            {
-                // Skip adjacent segments
-                if (j == i || j == i + 1)
-                {
-                    continue;
-                }
-                Vector2 b1 = points[j];
-                Vector2 b2 = points[j + 1];
-
-                if (LineSegmentsIntersect(a1, a2, b1, b2, out Vector2 intersection))
-                {
-                    intersections.Add(intersection);
-                    // Optional: Insert into points list (if needed)
-                }
-            }
-        }
-
-        return intersections;
-    }
-
-    private bool LineSegmentsIntersect(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, out Vector2 intersection)
-    {
-        intersection = Vector2.zero;
-
-        float denominator = (p1.x - p2.x) * (p3.y - p4.y) - 
-                            (p1.y - p2.y) * (p3.x - p4.x);
-
-        if (Mathf.Approximately(denominator, 0))
-        {
-            return false; // Parallel lines
-        }
-        float x = ((p1.x * p2.y - p1.y * p2.x) * (p3.x - p4.x) -
-                   (p1.x - p2.x) * (p3.x * p4.y - p3.y * p4.x)) / denominator;
-
-        float y = ((p1.x * p2.y - p1.y * p2.x) * (p3.y - p4.y) -
-                   (p1.y - p2.y) * (p3.x * p4.y - p3.y * p4.x)) / denominator;
-
-        intersection = new Vector2(x, y);
-
-        // Check if the intersection is within both segments
-        if (IsPointOnSegment(p1, p2, intersection) && IsPointOnSegment(p3, p4, intersection))
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private bool IsPointOnSegment(Vector2 a, Vector2 b, Vector2 p)
-    {
-        return p.x >= Mathf.Min(a.x, b.x) && p.x <= Mathf.Max(a.x, b.x) &&
-               p.y >= Mathf.Min(a.y, b.y) && p.y <= Mathf.Max(a.y, b.y);
     }
 }
