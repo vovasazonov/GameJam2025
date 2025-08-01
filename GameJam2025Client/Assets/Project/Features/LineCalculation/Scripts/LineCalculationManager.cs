@@ -20,6 +20,11 @@ namespace Project.Features.LineCalculation.Scripts
             {
                 AddEdge(graph, points[i], points[i + 1]);
                 AddEdge(graph, points[i + 1], points[i]);
+                if (i == points.Count - 2)
+                {
+                    AddEdge(graph, points[i+1], points[0]);
+                    AddEdge(graph, points[0], points[i+1]);
+                }
             }
 
             var routes = new List<List<Vector2>>();
@@ -30,7 +35,9 @@ namespace Project.Features.LineCalculation.Scripts
                 DFS(start, start, new List<Vector2>(), new HashSet<Vector2>(), graph, intersections, routes, uniqueRoutes);
             }
 
-            return routes;        }
+            return routes;
+        }
+
         private void DFS(
             Vector2 current,
             Vector2 start,
@@ -87,12 +94,13 @@ namespace Project.Features.LineCalculation.Scripts
                     uniqueRoutes
                 );
             }
-        }     
-        
+        }
+
         private string SerializeLoop(IEnumerable<Vector2> path)
         {
             return string.Join("->", path.Select(p => $"{p.x:F4},{p.y:F4}"));
         }
+
         private void AddEdge(Dictionary<Vector2, List<Vector2>> graph, Vector2 a, Vector2 b)
         {
             if (!graph.TryGetValue(a, out var neighbors))
@@ -203,11 +211,4 @@ namespace Project.Features.LineCalculation.Scripts
                    p.y >= Mathf.Min(a.y, b.y) && p.y <= Mathf.Max(a.y, b.y);
         }
     }
-    
-    public class Vector2Comparer : IEqualityComparer<Vector2>
-    {
-        public bool Equals(Vector2 a, Vector2 b) => Vector2.Distance(a, b) < 0.0001f;
-        public int GetHashCode(Vector2 v) => v.x.GetHashCode() ^ v.y.GetHashCode();
-    }
-
 }
