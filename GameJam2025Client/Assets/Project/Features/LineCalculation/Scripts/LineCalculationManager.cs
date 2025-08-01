@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Project.Core.Scripts;
 using UnityEngine;
 
@@ -8,7 +9,9 @@ namespace Project.Features.LineCalculation.Scripts
     {
         public List<List<Vector2>> FindRoutes(List<Vector2> points)
         {
-            List<Vector2> intersections = FindIntersections(points);
+            List<Vector2> intersections = points.GroupBy(x => x)
+                .Where(g => g.Count() > 1)
+                .Select(y => y.Key).ToList();
             var graph = new Dictionary<Vector2, List<Vector2>>();
 
             for (int i = 0; i < points.Count - 1; i++)
@@ -75,7 +78,7 @@ namespace Project.Features.LineCalculation.Scripts
 
         public void AddIntersectionsToLine(ref List<Vector2> points)
         {
-            List<(int insertIndex, Vector2 point)> intersectionsToInsert = new();
+            List<(int insertIndex, Vector2 point)> intersectionsToInsert = new List<(int insertIndex, Vector2 point)>();
 
             for (int i = 0; i < points.Count - 1; i++)
             {
@@ -109,7 +112,7 @@ namespace Project.Features.LineCalculation.Scripts
 
         public List<Vector2> FindIntersections(List<Vector2> points)
         {
-            List<Vector2> intersections = new();
+            List<Vector2> intersections = new List<Vector2>();
 
             for (int i = 0; i < points.Count - 1; i++)
             {

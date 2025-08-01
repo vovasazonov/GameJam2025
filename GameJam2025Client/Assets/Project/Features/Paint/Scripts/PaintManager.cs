@@ -21,9 +21,10 @@ public class PaintManager : SingletonBehaviour<PaintManager>
     private Vector2 _previousPosition;
     private bool _hasPreviousInput;
     private InputAction _pointAction;
+    private readonly List<GameObject> _tempObjects = new List<GameObject>();
 
     public event Action PointsUpdated;
-    public List<Vector2> CurrentPoints { get; } = new();
+    public List<Vector2> CurrentPoints { get; } = new List<Vector2>();
 
     private void Start()
     {
@@ -45,9 +46,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
             }
         }
     }
-
-    private readonly List<GameObject> _tempObjects = new();
-
+    
     private void UpdateDrawnLoops()
     {
         CurrentPoints.Clear();
@@ -65,17 +64,14 @@ public class PaintManager : SingletonBehaviour<PaintManager>
 
     private void DrawIntersections()
     {
-        if (_shouldDrawResult)
+        var intersections = CurrentPoints.GroupBy(x => x)
+            .Where(g => g.Count() > 1)
+            .Select(y => y.Key);
+        foreach (var intersection in intersections)
         {
-            var intersections = CurrentPoints.GroupBy(x => x)
-                .Where(g => g.Count() > 1)
-                .Select(y => y.Key);
-            foreach (var intersection in intersections)
-            {
-                var obj = Object.Instantiate(_intersectionPrefab);
-                obj.transform.position = intersection;
-                _tempObjects.Add(obj);
-            }
+            var obj = Object.Instantiate(_intersectionPrefab);
+            obj.transform.position = intersection;
+            _tempObjects.Add(obj);
         }
     }
     
