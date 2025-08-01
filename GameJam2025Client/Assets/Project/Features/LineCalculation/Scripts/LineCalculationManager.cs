@@ -9,6 +9,8 @@ namespace Project.Features.LineCalculation.Scripts
     {
         public List<List<Vector2>> FindRoutes(List<Vector2> points)
         {
+            points = points.Select(i => Round(i)).ToList();
+            
             DFSVisualizerManager.Instance?.Clear();
 
             var intersections = new HashSet<Vector2>(
@@ -113,6 +115,14 @@ namespace Project.Features.LineCalculation.Scripts
                 neighbors.Add(b);
         }
 
+        private Vector2 Round(Vector2 v, int decimals = 2)
+        {
+            return new Vector2(
+                (float)Mathf.Round(v.x * Mathf.Pow(10, decimals)) / Mathf.Pow(10, decimals),
+                (float)Mathf.Round(v.y * Mathf.Pow(10, decimals)) / Mathf.Pow(10, decimals)
+            );
+        }
+        
         public void AddIntersectionsToLine(ref List<Vector2> points)
         {
             List<(int insertIndex, Vector2 point)> intersectionsToInsert = new List<(int insertIndex, Vector2 point)>();
