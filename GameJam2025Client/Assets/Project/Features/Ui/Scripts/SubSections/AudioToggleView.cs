@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Project.Features.Ui.Scripts
+namespace Project.Features.Ui.Scripts.SubSections
 {
     public class AudioToggleView : MonoBehaviour, IPointerClickHandler
     {

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Project.Core.Scripts;
 using UnityEngine;
@@ -18,6 +17,7 @@ namespace Project.Features.Credit.Scripts
 
     public class CreditData
     {
-        public List<string> credits;
+        public List<string> developers;
+        public List<string> asset_credits;
     }
 }
