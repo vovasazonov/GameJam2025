@@ -7,10 +7,12 @@ namespace Project.Features.LineCalculation.Scripts
 {
     public class LineCalculationManager : SingletonBehaviour<LineCalculationManager>
     {
+        private const float AVOID_ROUTES_WITH_DUPLICATION_PERCENT = 0.8f;
+
         public List<List<Vector2>> FindRoutes(List<Vector2> points)
         {
-            points = points.Select(i => Round(i)).ToList();
-            
+            // points = points.Select(i => Round(i)).ToList();
+
             DFSVisualizerManager.Instance?.Clear();
 
             var intersections = new HashSet<Vector2>(
@@ -32,8 +34,8 @@ namespace Project.Features.LineCalculation.Scripts
                 AddEdge(graph, points[i + 1], points[i]);
                 if (i == points.Count - 2)
                 {
-                    AddEdge(graph, points[i+1], points[0]);
-                    AddEdge(graph, points[0], points[i+1]);
+                    AddEdge(graph, points[i + 1], points[0]);
+                    AddEdge(graph, points[0], points[i + 1]);
                 }
             }
 
@@ -67,12 +69,11 @@ namespace Project.Features.LineCalculation.Scripts
             // Valid loop: length > 2, ends back at starting intersection
             if (path.Count > 2 && current == start)
             {
-                const float duplicateIfMatchPercent = 0.9f;
                 var candidatesToSimiliarRoutes = routes.FindAll(i =>
                 {
                     var checkingCount = path.Count;
-                    var minCount = duplicateIfMatchPercent * checkingCount;
-                    var maxCount = (1 + 1 - duplicateIfMatchPercent) * checkingCount;
+                    var minCount = AVOID_ROUTES_WITH_DUPLICATION_PERCENT * checkingCount;
+                    var maxCount = (1 + 1 - AVOID_ROUTES_WITH_DUPLICATION_PERCENT) * checkingCount;
                     return i.Count >= minCount && i.Count <= maxCount;
                 });
 
@@ -86,11 +87,10 @@ namespace Project.Features.LineCalculation.Scripts
                     foreach (var candidateDuplicateRoute in candidatesToSimiliarRoutes)
                     {
                         float totalCount = path.Count;
-                        float intersectedCount = candidateDuplicateRoute.Intersect(path).Count(); 
-                        isDuplicated = isDuplicated || intersectedCount/totalCount >= duplicateIfMatchPercent;
-
+                        float intersectedCount = candidateDuplicateRoute.Intersect(path).Count();
+                        isDuplicated = isDuplicated || intersectedCount / totalCount >= AVOID_ROUTES_WITH_DUPLICATION_PERCENT;
                     }
-                    
+
                     if (!isDuplicated)
                     {
                         routes.Add(new List<Vector2>(path));
@@ -143,7 +143,7 @@ namespace Project.Features.LineCalculation.Scripts
                 (float)Mathf.Round(v.y * Mathf.Pow(10, decimals)) / Mathf.Pow(10, decimals)
             );
         }
-        
+
         public void AddIntersectionsToLine(ref List<Vector2> points)
         {
             List<(int insertIndex, Vector2 point)> intersectionsToInsert = new List<(int insertIndex, Vector2 point)>();

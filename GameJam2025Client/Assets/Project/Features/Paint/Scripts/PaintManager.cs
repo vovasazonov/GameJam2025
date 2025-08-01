@@ -88,8 +88,9 @@ public class PaintManager : SingletonBehaviour<PaintManager>
             {
                 var point = new Vector3(route[i].x, route[i].y, 0);
                 obj.SetPosition(i, point);
-                obj.startColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
-                obj.endColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+                var color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+                obj.startColor = color;
+                obj.endColor = color;
             }
         }
     }
