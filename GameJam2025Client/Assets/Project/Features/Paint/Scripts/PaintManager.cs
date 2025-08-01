@@ -1,18 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Project.Core.Scripts;
 using Project.Features.Input.Scripts;
 using Project.Features.LineCalculation.Scripts;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(LineRenderer))]
 public class PaintManager : SingletonBehaviour<PaintManager>
 {
     [SerializeField] private float _minDistanceBetweenPoints = 0.1f;
     [SerializeField] private GameObject _intersectionPrefab;
-    [SerializeField] private bool _shouldDrawIntersections;
+    [SerializeField] private bool _shouldDrawResult = true;
+    [SerializeField] private LineRenderer _lineRendererLoopPrefab;
 
     private LineRenderer _lineRenderer;
     private Vector2 _previousPosition;
@@ -43,7 +46,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
         }
     }
 
-    private readonly List<GameObject> _intersectingObjects = new();
+    private readonly List<GameObject> _tempObjects = new();
 
     private void UpdateDrawnLoops()
     {
@@ -56,21 +59,41 @@ public class PaintManager : SingletonBehaviour<PaintManager>
 
         var points = CurrentPoints;
         LineCalculationManager.Instance.AddIntersectionsToLine(ref points);
-
+        
         PointsUpdated?.Invoke();
     }
 
     private void DrawIntersections()
     {
-        if (_shouldDrawIntersections)
+        if (_shouldDrawResult)
         {
-            _intersectingObjects.ForEach(Object.Destroy);
-            _intersectingObjects.Clear();
-            foreach (var point in LineCalculationManager.Instance.FindIntersections(CurrentPoints))
+            var intersections = CurrentPoints.GroupBy(x => x)
+                .Where(g => g.Count() > 1)
+                .Select(y => y.Key);
+            foreach (var intersection in intersections)
             {
                 var obj = Object.Instantiate(_intersectionPrefab);
-                obj.transform.position = point;
-                _intersectingObjects.Add(obj);
+                obj.transform.position = intersection;
+                _tempObjects.Add(obj);
+            }
+        }
+    }
+    
+    private void DrawPossibleLoops()
+    {
+        var routes = LineCalculationManager.Instance.FindRoutes(CurrentPoints);
+        foreach (var route in routes)
+        {
+            var obj = Object.Instantiate(_lineRendererLoopPrefab);
+            obj.transform.position = Vector3.zero;
+            obj.positionCount = route.Count;
+            for (int i = 0; i < route.Count; i++)
+            {
+                var cameraZ = PositionZ();
+                var point = new Vector3(route[i].x, route[i].y, cameraZ);
+                obj.SetPosition(i, point);
+                obj.startColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+                obj.endColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
             }
         }
     }
@@ -79,7 +102,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
     {
         var input = InputManager.Instance.PointPosition;
 
-        var cameraZ = -1 * Camera.main.transform.position.z;
+        var cameraZ = PositionZ();
         var currentPosition = Camera.main.ScreenToWorldPoint(new Vector3(input.x, input.y, cameraZ));
         currentPosition.z = 0;
 
@@ -103,18 +126,27 @@ public class PaintManager : SingletonBehaviour<PaintManager>
         }
     }
 
+    private static float PositionZ()
+    {
+        return -1 * Camera.main.transform.position.z;
+    }
+
     private void OnStartPaint()
     {
         _lineRenderer.loop = false;
         
-        _intersectingObjects.ForEach(Object.Destroy);
-        _intersectingObjects.Clear();
+        _tempObjects.ForEach(Object.Destroy);
+        _tempObjects.Clear();
     }
 
     private void OnStopPaint()
     {
         _lineRenderer.loop = true;
         UpdateDrawnLoops();
-        DrawIntersections();
+        if (_shouldDrawResult)
+        {
+            DrawIntersections();
+            // DrawPossibleLoops();
+        }
     }
 }

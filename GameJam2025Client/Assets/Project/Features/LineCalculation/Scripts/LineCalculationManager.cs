@@ -6,6 +6,73 @@ namespace Project.Features.LineCalculation.Scripts
 {
     public class LineCalculationManager : SingletonBehaviour<LineCalculationManager>
     {
+        public List<List<Vector2>> FindRoutes(List<Vector2> points)
+        {
+            List<Vector2> intersections = FindIntersections(points);
+            var graph = new Dictionary<Vector2, List<Vector2>>();
+
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                Vector2 a = points[i];
+                Vector2 b = points[i + 1];
+                AddEdge(graph, a, b);
+                AddEdge(graph, b, a);
+            }
+
+            var routes = new List<List<Vector2>>();
+            foreach (var start in intersections)
+            {
+                var visited = new HashSet<Vector2>();
+                DFS(start, start, new List<Vector2>(), visited, graph, intersections, routes);
+            }
+
+            return routes;
+        }
+        
+        private void DFS(
+            Vector2 current,
+            Vector2 start,
+            List<Vector2> path,
+            HashSet<Vector2> visited,
+            Dictionary<Vector2, List<Vector2>> graph,
+            List<Vector2> intersections,
+            List<List<Vector2>> routes)
+        {
+            path.Add(current);
+
+            if (path.Count > 1 && intersections.Contains(current) && current != start)
+            {
+                routes.Add(new List<Vector2>(path));
+                // Continue DFS to find other paths
+            }
+
+            visited.Add(current);
+
+            foreach (var neighbor in graph[current])
+            {
+                bool isIntersection = intersections.Contains(neighbor);
+                bool alreadyVisited = visited.Contains(neighbor);
+
+                if (isIntersection || !alreadyVisited)
+                {
+                    DFS(neighbor, start, new List<Vector2>(path), new HashSet<Vector2>(visited), graph, intersections, routes);
+                }
+            }
+        }
+        
+        
+        private void AddEdge(Dictionary<Vector2, List<Vector2>> graph, Vector2 a, Vector2 b)
+        {
+            if (!graph.TryGetValue(a, out var neighbors))
+            {
+                neighbors = new List<Vector2>();
+                graph[a] = neighbors;
+            }
+
+            if (!neighbors.Contains(b))
+                neighbors.Add(b);
+        }
+
         public void AddIntersectionsToLine(ref List<Vector2> points)
         {
             List<(int insertIndex, Vector2 point)> intersectionsToInsert = new();
