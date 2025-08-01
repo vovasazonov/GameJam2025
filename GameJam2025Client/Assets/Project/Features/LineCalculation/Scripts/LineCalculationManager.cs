@@ -9,7 +9,7 @@ namespace Project.Features.LineCalculation.Scripts
     {
         private const float AVOID_ROUTES_WITH_DUPLICATION_PERCENT = 0.8f;
 
-        public List<List<Vector2>> FindRoutes(List<Vector2> points)
+        public List<List<Vector2>> FindLoops(List<Vector2> points)
         {
             // points = points.Select(i => Round(i)).ToList();
 

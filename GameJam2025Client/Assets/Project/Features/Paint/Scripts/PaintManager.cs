@@ -77,7 +77,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
     
     private void DrawPossibleLoops()
     {
-        var routes = LineCalculationManager.Instance.FindRoutes(CurrentPoints);
+        var routes = LineCalculationManager.Instance.FindLoops(CurrentPoints);
         foreach (var route in routes)
         {
             var obj = Object.Instantiate(_lineRendererLoopPrefab, this.transform, true);
