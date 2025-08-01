@@ -81,6 +81,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
         foreach (var route in routes)
         {
             var obj = Object.Instantiate(_lineRendererLoopPrefab, this.transform, true);
+            _tempObjects.Add(obj.gameObject);
             obj.transform.position = Vector3.zero;
             obj.positionCount = route.Count;
             for (int i = 0; i < route.Count; i++)

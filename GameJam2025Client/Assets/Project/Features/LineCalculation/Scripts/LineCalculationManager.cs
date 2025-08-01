@@ -10,64 +10,89 @@ namespace Project.Features.LineCalculation.Scripts
         public List<List<Vector2>> FindRoutes(List<Vector2> points)
         {
             DFSVisualizerManager.Instance?.Clear();
-            
-            List<Vector2> intersections = points.GroupBy(x => x)
-                .Where(g => g.Count() > 1)
-                .Select(y => y.Key).ToList();
-            var graph = new Dictionary<Vector2, List<Vector2>>();
 
+            var intersections = new HashSet<Vector2>(
+                points.GroupBy(p => p).Where(g => g.Count() > 1).Select(g => g.Key)
+            );
+
+            var graph = new Dictionary<Vector2, List<Vector2>>();
             for (int i = 0; i < points.Count - 1; i++)
             {
-                Vector2 a = points[i];
-                Vector2 b = points[i + 1];
-                AddEdge(graph, a, b);
-                AddEdge(graph, b, a);
+                AddEdge(graph, points[i], points[i + 1]);
+                AddEdge(graph, points[i + 1], points[i]);
             }
 
             var routes = new List<List<Vector2>>();
+            var uniqueRoutes = new HashSet<string>();
+
             foreach (var start in intersections)
             {
-                var visited = new HashSet<Vector2>();
-                DFS(start, start, new List<Vector2>(), visited, graph, intersections, routes);
+                DFS(start, start, new List<Vector2>(), new HashSet<Vector2>(), graph, intersections, routes, uniqueRoutes);
             }
 
-            return routes;
-        }
-        
+            return routes;        }
         private void DFS(
             Vector2 current,
             Vector2 start,
             List<Vector2> path,
-            HashSet<Vector2> visited,
+            HashSet<Vector2> visitedNonIntersections,
             Dictionary<Vector2, List<Vector2>> graph,
-            List<Vector2> intersections,
-            List<List<Vector2>> routes)
+            HashSet<Vector2> intersections,
+            List<List<Vector2>> routes,
+            HashSet<string> uniqueRoutes)
         {
             path.Add(current);
 
-            DFSVisualizerManager.Instance?.VisualizeStep(path); 
-            
-            if (path.Count > 1 && intersections.Contains(current) && current != start)
+            bool isIntersection = intersections.Contains(current);
+            if (!isIntersection)
             {
-                routes.Add(new List<Vector2>(path));
-                // Continue DFS to find other paths
+                visitedNonIntersections.Add(current);
             }
 
-            visited.Add(current);
+            // Valid loop: length > 2, ends back at starting intersection
+            if (path.Count > 2 && current == start)
+            {
+                string key = SerializeLoop(path);
+                string reversedKey = SerializeLoop(path.AsEnumerable().Reverse());
+
+                if (!uniqueRoutes.Contains(key) && !uniqueRoutes.Contains(reversedKey))
+                {
+                    uniqueRoutes.Add(key);
+                    routes.Add(new List<Vector2>(path));
+                }
+
+                return;
+            }
 
             foreach (var neighbor in graph[current])
             {
-                bool isIntersection = intersections.Contains(neighbor);
-                bool alreadyVisited = visited.Contains(neighbor);
+                bool neighborIsIntersection = intersections.Contains(neighbor);
 
-                if (isIntersection || !alreadyVisited)
-                {
-                    DFS(neighbor, start, new List<Vector2>(path), new HashSet<Vector2>(visited), graph, intersections, routes);
-                }
+                // Don't revisit non-intersections
+                if (!neighborIsIntersection && visitedNonIntersections.Contains(neighbor))
+                    continue;
+
+                // Prevent infinite self-loop from 2-point cycle
+                if (path.Count > 1 && neighbor == start && path[path.Count - 2] == start)
+                    continue;
+
+                DFS(
+                    neighbor,
+                    start,
+                    new List<Vector2>(path),
+                    new HashSet<Vector2>(visitedNonIntersections),
+                    graph,
+                    intersections,
+                    routes,
+                    uniqueRoutes
+                );
             }
+        }     
+        
+        private string SerializeLoop(IEnumerable<Vector2> path)
+        {
+            return string.Join("->", path.Select(p => $"{p.x:F4},{p.y:F4}"));
         }
-        
-        
         private void AddEdge(Dictionary<Vector2, List<Vector2>> graph, Vector2 a, Vector2 b)
         {
             if (!graph.TryGetValue(a, out var neighbors))
@@ -178,4 +203,11 @@ namespace Project.Features.LineCalculation.Scripts
                    p.y >= Mathf.Min(a.y, b.y) && p.y <= Mathf.Max(a.y, b.y);
         }
     }
+    
+    public class Vector2Comparer : IEqualityComparer<Vector2>
+    {
+        public bool Equals(Vector2 a, Vector2 b) => Vector2.Distance(a, b) < 0.0001f;
+        public int GetHashCode(Vector2 v) => v.x.GetHashCode() ^ v.y.GetHashCode();
+    }
+
 }
