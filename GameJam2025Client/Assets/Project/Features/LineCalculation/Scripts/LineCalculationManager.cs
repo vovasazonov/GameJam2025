@@ -17,6 +17,14 @@ namespace Project.Features.LineCalculation.Scripts
                 points.GroupBy(p => p).Where(g => g.Count() > 1).Select(g => g.Key)
             );
 
+            if (intersections.Count == 0)
+            {
+                return new List<List<Vector2>>()
+                {
+                    new List<Vector2>(points)
+                };
+            }
+
             var graph = new Dictionary<Vector2, List<Vector2>>();
             for (int i = 0; i < points.Count - 1; i++)
             {
