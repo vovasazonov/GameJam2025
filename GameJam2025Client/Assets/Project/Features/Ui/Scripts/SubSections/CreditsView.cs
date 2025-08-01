@@ -12,7 +12,7 @@ namespace Project.Features.Ui.Scripts.SubSections
         [SerializeField] private TMP_Text _developersCreditsText;
         [SerializeField] private TMP_Text _assetsCreditsText;
 
-        private void OnEnable()
+        private void Start()
         {
             var creditsData = CreditManager.Instance.GetCreditsText();
             
