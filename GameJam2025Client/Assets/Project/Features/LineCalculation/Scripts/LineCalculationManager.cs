@@ -9,6 +9,8 @@ namespace Project.Features.LineCalculation.Scripts
     {
         public List<List<Vector2>> FindRoutes(List<Vector2> points)
         {
+            DFSVisualizerManager.Instance?.Clear();
+            
             List<Vector2> intersections = points.GroupBy(x => x)
                 .Where(g => g.Count() > 1)
                 .Select(y => y.Key).ToList();
@@ -43,6 +45,8 @@ namespace Project.Features.LineCalculation.Scripts
         {
             path.Add(current);
 
+            DFSVisualizerManager.Instance?.VisualizeStep(path); 
+            
             if (path.Count > 1 && intersections.Contains(current) && current != start)
             {
                 routes.Add(new List<Vector2>(path));

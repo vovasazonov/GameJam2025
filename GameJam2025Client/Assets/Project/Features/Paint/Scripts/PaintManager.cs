@@ -69,7 +69,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
             .Select(y => y.Key);
         foreach (var intersection in intersections)
         {
-            var obj = Object.Instantiate(_intersectionPrefab);
+            var obj = Object.Instantiate(_intersectionPrefab, this.transform, true);
             obj.transform.position = intersection;
             _tempObjects.Add(obj);
         }
@@ -80,13 +80,12 @@ public class PaintManager : SingletonBehaviour<PaintManager>
         var routes = LineCalculationManager.Instance.FindRoutes(CurrentPoints);
         foreach (var route in routes)
         {
-            var obj = Object.Instantiate(_lineRendererLoopPrefab);
+            var obj = Object.Instantiate(_lineRendererLoopPrefab, this.transform, true);
             obj.transform.position = Vector3.zero;
             obj.positionCount = route.Count;
             for (int i = 0; i < route.Count; i++)
             {
-                var cameraZ = PositionZ();
-                var point = new Vector3(route[i].x, route[i].y, cameraZ);
+                var point = new Vector3(route[i].x, route[i].y, 0);
                 obj.SetPosition(i, point);
                 obj.startColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
                 obj.endColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
@@ -98,7 +97,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
     {
         var input = InputManager.Instance.PointPosition;
 
-        var cameraZ = PositionZ();
+        var cameraZ = -1 * Camera.main.transform.position.z;
         var currentPosition = Camera.main.ScreenToWorldPoint(new Vector3(input.x, input.y, cameraZ));
         currentPosition.z = 0;
 
@@ -120,11 +119,6 @@ public class PaintManager : SingletonBehaviour<PaintManager>
             _hasPreviousInput = true;
             OnStartPaint();
         }
-    }
-
-    private static float PositionZ()
-    {
-        return -1 * Camera.main.transform.position.z;
     }
 
     private void OnStartPaint()
