@@ -30,11 +30,10 @@ namespace Project.Features.LineCalculation.Scripts
             }
 
             var routes = new List<List<Vector2>>();
-            var uniqueRoutes = new HashSet<string>();
 
             foreach (var start in intersections)
             {
-                DFS(start, start, new List<Vector2>(), new HashSet<Vector2>(), graph, intersections, routes, uniqueRoutes);
+                DFS(start, start, new List<Vector2>(), new HashSet<Vector2>(), graph, intersections, routes);
             }
 
             return routes;
@@ -47,8 +46,7 @@ namespace Project.Features.LineCalculation.Scripts
             HashSet<Vector2> visitedNonIntersections,
             Dictionary<Vector2, List<Vector2>> graph,
             HashSet<Vector2> intersections,
-            List<List<Vector2>> routes,
-            HashSet<string> uniqueRoutes)
+            List<List<Vector2>> routes)
         {
             path.Add(current);
 
@@ -61,13 +59,34 @@ namespace Project.Features.LineCalculation.Scripts
             // Valid loop: length > 2, ends back at starting intersection
             if (path.Count > 2 && current == start)
             {
-                string key = SerializeLoop(path);
-                string reversedKey = SerializeLoop(path.AsEnumerable().Reverse());
-
-                if (!uniqueRoutes.Contains(key) && !uniqueRoutes.Contains(reversedKey))
+                const float duplicateIfMatchPercent = 0.9f;
+                var candidatesToSimiliarRoutes = routes.FindAll(i =>
                 {
-                    uniqueRoutes.Add(key);
+                    var checkingCount = path.Count;
+                    var minCount = duplicateIfMatchPercent * checkingCount;
+                    var maxCount = (1 + 1 - duplicateIfMatchPercent) * checkingCount;
+                    return i.Count >= minCount && i.Count <= maxCount;
+                });
+
+                if (candidatesToSimiliarRoutes.Count == 0)
+                {
                     routes.Add(new List<Vector2>(path));
+                }
+                else
+                {
+                    var isDuplicated = false;
+                    foreach (var candidateDuplicateRoute in candidatesToSimiliarRoutes)
+                    {
+                        float totalCount = path.Count;
+                        float intersectedCount = candidateDuplicateRoute.Intersect(path).Count(); 
+                        isDuplicated = isDuplicated || intersectedCount/totalCount >= duplicateIfMatchPercent;
+
+                    }
+                    
+                    if (!isDuplicated)
+                    {
+                        routes.Add(new List<Vector2>(path));
+                    }
                 }
 
                 return;
@@ -92,15 +111,9 @@ namespace Project.Features.LineCalculation.Scripts
                     new HashSet<Vector2>(visitedNonIntersections),
                     graph,
                     intersections,
-                    routes,
-                    uniqueRoutes
+                    routes
                 );
             }
-        }
-
-        private string SerializeLoop(IEnumerable<Vector2> path)
-        {
-            return string.Join("->", path.Select(p => $"{p.x:F4},{p.y:F4}"));
         }
 
         private void AddEdge(Dictionary<Vector2, List<Vector2>> graph, Vector2 a, Vector2 b)
