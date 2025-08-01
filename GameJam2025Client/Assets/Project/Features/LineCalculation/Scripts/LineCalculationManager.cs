@@ -63,54 +63,25 @@ namespace Project.Features.LineCalculation.Scripts
             bool isIntersection = intersections.Contains(current);
             if (!isIntersection)
             {
+                if (visitedNonIntersections.Contains(current))
+                    return; // non-intersections can only be visited once
                 visitedNonIntersections.Add(current);
             }
 
-            // Valid loop: length > 2, ends back at starting intersection
+            // Valid loop: start == current, path length > 2
             if (path.Count > 2 && current == start)
             {
-                var candidatesToSimiliarRoutes = routes.FindAll(i =>
-                {
-                    var checkingCount = path.Count;
-                    var minCount = AVOID_ROUTES_WITH_DUPLICATION_PERCENT * checkingCount;
-                    var maxCount = (1 + 1 - AVOID_ROUTES_WITH_DUPLICATION_PERCENT) * checkingCount;
-                    return i.Count >= minCount && i.Count <= maxCount;
-                });
-
-                if (candidatesToSimiliarRoutes.Count == 0)
+                if (!IsSimilarRouteAlreadyExists(path, routes))
                 {
                     routes.Add(new List<Vector2>(path));
                 }
-                else
-                {
-                    var isDuplicated = false;
-                    foreach (var candidateDuplicateRoute in candidatesToSimiliarRoutes)
-                    {
-                        float totalCount = path.Count;
-                        float intersectedCount = candidateDuplicateRoute.Intersect(path).Count();
-                        isDuplicated = isDuplicated || intersectedCount / totalCount >= AVOID_ROUTES_WITH_DUPLICATION_PERCENT;
-                    }
-
-                    if (!isDuplicated)
-                    {
-                        routes.Add(new List<Vector2>(path));
-                    }
-                }
-
-                return;
+                // Continue to explore deeper loops (don’t return here)
             }
 
             foreach (var neighbor in graph[current])
             {
-                bool neighborIsIntersection = intersections.Contains(neighbor);
-
-                // Don't revisit non-intersections
-                if (!neighborIsIntersection && visitedNonIntersections.Contains(neighbor))
-                    continue;
-
-                // Prevent infinite self-loop from 2-point cycle
-                if (path.Count > 1 && neighbor == start && path[path.Count - 2] == start)
-                    continue;
+                if (path.Count > 1 && neighbor == path[path.Count - 2])
+                    continue; // avoid immediate backtracking
 
                 DFS(
                     neighbor,
@@ -124,6 +95,19 @@ namespace Project.Features.LineCalculation.Scripts
             }
         }
 
+        private bool IsSimilarRouteAlreadyExists(List<Vector2> newPath, List<List<Vector2>> existingRoutes)
+        {
+            foreach (var route in existingRoutes)
+            {
+                float overlap = route.Intersect(newPath).Count();
+                float similarity = overlap / Mathf.Max(newPath.Count, route.Count);
+
+                if (similarity >= AVOID_ROUTES_WITH_DUPLICATION_PERCENT)
+                    return true;
+            }
+            return false;
+        }
+        
         private void AddEdge(Dictionary<Vector2, List<Vector2>> graph, Vector2 a, Vector2 b)
         {
             if (!graph.TryGetValue(a, out var neighbors))
