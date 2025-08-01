@@ -142,7 +142,7 @@ public class PaintManager : SingletonBehaviour<PaintManager>
         if (_shouldDrawResult)
         {
             DrawIntersections();
-            // DrawPossibleLoops();
+            DrawPossibleLoops();
         }
     }
 }
