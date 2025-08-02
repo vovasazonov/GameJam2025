@@ -13,6 +13,16 @@ namespace Project.Features.Ui.Scripts.LevelButton
             _button.onClick.AddListener(LoadLevel); ;
         }
 
+        private void MakeLevelOpened()
+        {
+            _button.interactable = true;
+        }
+
+        private void MakeLevelClosed()
+        {
+            _button.interactable = false; 
+        }
+        
         private void LoadLevel()
         {
             LevelManager.Instance.LoadLevel(id);
