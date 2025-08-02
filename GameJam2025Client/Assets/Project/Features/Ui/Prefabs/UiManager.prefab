@@ -2554,6 +2554,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loopFoundDisplay: {fileID: 2107180965639380183}
+  levelChoserMenu: {fileID: 8681787121443562298}
+  levelMenu: {fileID: 2700724121979216091}
 --- !u!1 &8564175706880312207
 GameObject:
   m_ObjectHideFlags: 0
