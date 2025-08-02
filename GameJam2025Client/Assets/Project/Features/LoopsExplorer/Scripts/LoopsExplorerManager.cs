@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Project.Core.Scripts;
 using Project.Features.Input.Scripts;
+using Project.Features.Rails.Scripts;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -12,7 +13,6 @@ namespace Project.Features.LoopsExplorer.Scripts
     {
         [SerializeField] private float _radiusFinger = 10f;
         [SerializeField] private float _matchThreshold = 0.6f;
-        [SerializeField] private LineRenderer _touchLineRenderer;
         [SerializeField] private LineRenderer _loopPrefab;
 
         private readonly Dictionary<int, List<Vector2>> _allLoopsById = new Dictionary<int, List<Vector2>>();
@@ -22,10 +22,11 @@ namespace Project.Features.LoopsExplorer.Scripts
         private readonly List<Vector2> _touchedPoints = new List<Vector2>();
         private bool _isDown;
 
-        private readonly List<LineRenderer> _foundLoops = new List<LineRenderer>();
+        private readonly List<RailsView> _foundLoops = new List<RailsView>();
+        private RailsView _touchesRail;
 
         public event Action<int> FoundLoop;
-        public event Action NewDataInitialized; 
+        public event Action NewDataInitialized;
         public int TotalLoops => _allLoopsById.Count;
         public int FoundLoops => _foundLoopsIds.Count;
         public IEnumerable<int> AllFoundLoopsIds() => _allLoopsById.Keys;
@@ -56,7 +57,8 @@ namespace Project.Features.LoopsExplorer.Scripts
             {
                 _allLoopsById.Add(i, loops[i]);
             }
-            
+
+            _foundLoops.ForEach(i => Destroy(i.gameObject));
             NewDataInitialized?.Invoke();
         }
 
@@ -73,13 +75,14 @@ namespace Project.Features.LoopsExplorer.Scripts
                 {
                     _isDown = true;
                     _touchedPoints.Clear();
+                    _touchesRail = RailsManager.Instance.CreateRails();
                 }
 
                 var inputPosition = InputManager.Instance.PointPosition;
                 var cameraZ = -1 * Camera.main.transform.position.z;
                 var currentPosition = Camera.main.ScreenToWorldPoint(new Vector3(inputPosition.x, inputPosition.y, cameraZ));
                 currentPosition.z = 0;
-                
+
                 var closestPoint = GetClosestPointOnLine(new Vector2(currentPosition.x, currentPosition.y));
 
                 if (closestPoint.HasValue)
@@ -89,22 +92,20 @@ namespace Project.Features.LoopsExplorer.Scripts
                     {
                         _touchedPoints.Add(point);
 
-                        _touchLineRenderer.positionCount++;
-                        _touchLineRenderer.SetPosition(_touchedPoints.Count - 1, point);
+                        _touchesRail.AddPosition(point);
                     }
                 }
             }
             else if (_isDown)
             {
                 _isDown = false;
+                Object.Destroy(_touchesRail.gameObject);
                 OnTouchEnd();
             }
         }
 
         private void OnTouchEnd()
         {
-            _touchLineRenderer.positionCount = 0;
-            
             if (_touchedPoints.Count < 3)
                 return;
 
@@ -121,6 +122,10 @@ namespace Project.Features.LoopsExplorer.Scripts
                 {
                     _foundLoopsIds.Add(kvp.Key);
                     Debug.Log($"Loop id:{kvp.Key} found! Total loops: {TotalLoops}, Found loops: {FoundLoops}");
+                    var rail = RailsManager.Instance.CreateRails();
+                    rail.AddPositions(kvp.Value.Select(i => new Vector3(i.x, i.y, 0)).ToList());
+                    rail.SetLoop(true);
+                    _foundLoops.Add(rail);
                     FoundLoop?.Invoke(kvp.Key);
                     break;
                 }
@@ -136,6 +141,7 @@ namespace Project.Features.LoopsExplorer.Scripts
                     return point;
                 }
             }
+
             return null;
         }
     }
