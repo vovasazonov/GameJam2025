@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8231da2644e6478d92d4b66a88fcaa10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _radiusFinger: 1
+  _radiusFinger: 0.3
   _matchThreshold: 0.7
   _touchLineRenderer: {fileID: 8274744068285602126}
   _loopPrefab: {fileID: 6454148934934958823, guid: f9a6602e9dea9404a806a5a6af0be233, type: 3}

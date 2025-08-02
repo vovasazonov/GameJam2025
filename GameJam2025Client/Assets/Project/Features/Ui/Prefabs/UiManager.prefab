@@ -2610,7 +2610,7 @@ GameObject:
   - component: {fileID: 7506375470619137011}
   - component: {fileID: 8507094886386562040}
   m_Layer: 0
-  m_Name: UiManager 1
+  m_Name: UiManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
