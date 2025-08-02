@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 953d3eb198994736a0c866e46e8de6b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _carriageSpacing: 1.25
+  _carriageSpacing: 1.5
   _speed: 1
   _rotationSpeed: 3
 --- !u!1 &8906134955562613929

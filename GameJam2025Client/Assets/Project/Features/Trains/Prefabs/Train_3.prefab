@@ -8,22 +8,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1004297781540060741, guid: 2b5f7ff5061064663926cd6394b69134, type: 3}
-      propertyPath: _carriageSpacing
-      value: 1.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 1004297781540060741, guid: 2b5f7ff5061064663926cd6394b69134, type: 3}
-      propertyPath: _childrens.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1004297781540060741, guid: 2b5f7ff5061064663926cd6394b69134, type: 3}
-      propertyPath: '_childrens.Array.data[0]'
-      value: 
-      objectReference: {fileID: 3599533790240418819}
-    - target: {fileID: 1004297781540060741, guid: 2b5f7ff5061064663926cd6394b69134, type: 3}
-      propertyPath: '_childrens.Array.data[1]'
-      value: 
-      objectReference: {fileID: 6597911777005541671}
     - target: {fileID: 4373661481892856878, guid: 2b5f7ff5061064663926cd6394b69134, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
