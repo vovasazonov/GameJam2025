@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Project.Core.Scripts;
+using Project.Features.LoopsExplorer.Scripts;
 using Project.Features.Tutorial.Scripts;
 using Project.Features.Ui.Scripts.LevelButton;
 using Unity.VisualScripting;
@@ -14,7 +15,8 @@ public class LevelManager : SingletonBehaviour<LevelManager>
     
     public void LoadLevel(int id)
     {
-        var points = LevelDatabase.Instance.GetLevel(id).points;
+        var data = LevelDatabase.Instance.GetLevel(id);
+        var points = data.points;
         
         if (id == 1 || id == 3)
         {
@@ -25,5 +27,6 @@ public class LevelManager : SingletonBehaviour<LevelManager>
         this.GameObject().SetActive(false);
         levelMenu.SetActive(true);
         LineDrawerFromDotsManager.Instance.DrawLine(points);
+        LoopsExplorerManager.Instance.InitializeExplorer(points, data.cycles);
     }
 }
