@@ -44,8 +44,8 @@ public class TrainView : MonoBehaviour
                 Vector2 direction = (nextPos - pos).normalized;
                 if (direction.sqrMagnitude > 0.001f)
                 {
+                    _carriages[i].transform.rotation = Quaternion.LookRotation(direction, Vector3.back);
                     float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                    _carriages[i].transform.rotation = Quaternion.Euler(0, 0, angle);
                 }
             }
 
