@@ -45,9 +45,9 @@ namespace Project.Features.Rails.Scripts
             if (_rails.Count == 0 || Vector3.Distance(_lastRailPosition, position) > _distanceBetweenRail)
             {
                 var rail = Instantiate(_railPrefab, transform);
-                Vector2 direction = _leftLineRenderer.positionCount > 1
+                Vector3 direction = _leftLineRenderer.positionCount > 1
                     ? (_leftLineRenderer.GetPosition(_leftLineRenderer.positionCount - 1) - _leftLineRenderer.GetPosition(_leftLineRenderer.positionCount - 2)).normalized
-                    : Vector2.zero;
+                    : Vector3.zero;
                 Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.back);
                 rail.transform.rotation = targetRotation;
                 rail.transform.position = position;
