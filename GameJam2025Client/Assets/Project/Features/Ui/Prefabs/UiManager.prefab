@@ -507,6 +507,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _onImage: {fileID: 8294578102010777761}
   _offImage: {fileID: 1636866468819123897}
+  rectTransform: {fileID: 0}
+  speed: 50
 --- !u!1 &1258291610136810214
 GameObject:
   m_ObjectHideFlags: 0
