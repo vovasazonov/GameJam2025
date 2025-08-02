@@ -25,6 +25,7 @@ namespace Project.Features.LoopsExplorer.Scripts
         private readonly List<LineRenderer> _foundLoops = new();
 
         public event Action<int> FoundLoop;
+        public event Action NewDataInitialized; 
         public int TotalLoops => _allLoopsById.Count;
         public int FoundLoops => _foundLoopsIds.Count;
         public IEnumerable<int> AllFoundLoopsIds() => _allLoopsById.Keys;
@@ -55,6 +56,8 @@ namespace Project.Features.LoopsExplorer.Scripts
             {
                 _allLoopsById.Add(i, loops[i]);
             }
+            
+            NewDataInitialized?.Invoke();
         }
 
         public List<Vector2> GetLoopById(int id)
