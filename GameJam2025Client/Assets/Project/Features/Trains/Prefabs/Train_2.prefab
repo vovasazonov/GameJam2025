@@ -147,6 +147,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1a257c10a1fe6423890b86b27faade9f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8273599920813178286}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1a257c10a1fe6423890b86b27faade9f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6389562940553510176}
   m_SourcePrefab: {fileID: 100100000, guid: 1a257c10a1fe6423890b86b27faade9f, type: 3}
 --- !u!4 &8246912662564266533 stripped
 Transform:
@@ -170,6 +173,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff18e74b51e1425988d1c25b8f28fb7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!111 &6389562940553510176
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8735078871342266527}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: 1de598767c12549b387a6a65b412b037, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 1de598767c12549b387a6a65b412b037, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!1001 &8710370544832987496
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -241,6 +261,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 14b68bc5e2cfa4feb903214245b6b234, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4053713990238788849}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 14b68bc5e2cfa4feb903214245b6b234, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6934635767366701778}
   m_SourcePrefab: {fileID: 100100000, guid: 14b68bc5e2cfa4feb903214245b6b234, type: 3}
 --- !u!1 &8367716753186683961 stripped
 GameObject:
@@ -259,6 +282,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff18e74b51e1425988d1c25b8f28fb7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!111 &6934635767366701778
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8367716753186683961}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: 1de598767c12549b387a6a65b412b037, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 1de598767c12549b387a6a65b412b037, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!4 &9181655058506753667 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 14b68bc5e2cfa4feb903214245b6b234, type: 3}

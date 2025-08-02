@@ -27,6 +27,8 @@ public class TrainView : MonoBehaviour
         _totalDistance += Vector2.Distance(_loopPath[_loopPath.Count - 1], _loopPath[0]); // close loop
 
         StartCoroutine(FollowPathCoroutine());
+
+        StartCarriageAnimationsWithDelay();
     }
 
     private IEnumerator FollowPathCoroutine()
@@ -82,5 +84,22 @@ public class TrainView : MonoBehaviour
         }
 
         return _loopPath[0]; // fallback
+    }
+    
+    private void StartCarriageAnimationsWithDelay()
+    {
+        StartCoroutine(PlayAnimationsSequentially());
+    }
+
+    private IEnumerator PlayAnimationsSequentially()
+    {
+        float delayBetweenCarriages = 0.2f; // delay in seconds
+
+        foreach (var carriage in _carriages)
+        {
+            carriage.PlayRideAnimation();
+
+            yield return new WaitForSeconds(delayBetweenCarriages);
+        }
     }
 }

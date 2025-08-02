@@ -136,6 +136,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a7f00ceaeb9144c1ca4b6d879f266ddf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8612813524197505893}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a7f00ceaeb9144c1ca4b6d879f266ddf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3856104611958465091}
   m_SourcePrefab: {fileID: 100100000, guid: a7f00ceaeb9144c1ca4b6d879f266ddf, type: 3}
 --- !u!4 &8212176880790501774 stripped
 Transform:
@@ -159,3 +162,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff18e74b51e1425988d1c25b8f28fb7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _rideAnimation: {fileID: 0}
+--- !u!111 &3856104611958465091
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8844036060360024884}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: 1de598767c12549b387a6a65b412b037, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 1de598767c12549b387a6a65b412b037, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
