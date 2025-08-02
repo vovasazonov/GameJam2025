@@ -1,16 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Project.Core.Scripts;
 using UnityEngine;
 
-public class LevelDatabase: SingletonBehaviour<LevelDatabase>
+public class LevelDatabase : SingletonBehaviour<LevelDatabase>
 {
     private string filePath;
     private LevelDatabaseWrapper databaseWrapper;
     private int nextId = 1;
     private string fileName = "levels.json";
+    [SerializeField] private TextAsset levels;
 
     public void Start()
     {
@@ -23,25 +23,24 @@ public class LevelDatabase: SingletonBehaviour<LevelDatabase>
     {
         // Всегда инициализируем новую обертку
         databaseWrapper = new LevelDatabaseWrapper();
-        
+
         // Загружаем данные только если файл существует
-        if (File.Exists(filePath))
+
+        string json = levels.text;
+        var loadedWrapper = JsonUtility.FromJson<LevelDatabaseWrapper>(json);
+
+        if (loadedWrapper != null && loadedWrapper.levels != null)
         {
-            string json = File.ReadAllText(filePath);
-            var loadedWrapper = JsonUtility.FromJson<LevelDatabaseWrapper>(json);
-            
-            if (loadedWrapper != null && loadedWrapper.levels != null)
+            databaseWrapper.levels = loadedWrapper.levels;
+
+            // Находим максимальный ID
+            if (databaseWrapper.levels.Count > 0)
             {
-                databaseWrapper.levels = loadedWrapper.levels;
-                
-                // Находим максимальный ID
-                if (databaseWrapper.levels.Count > 0)
-                {
-                    nextId = databaseWrapper.levels.Max(level => level.id) + 1;
-                }
+                nextId = databaseWrapper.levels.Max(level => level.id) + 1;
             }
         }
-        
+
+
         // Гарантируем, что список уровней всегда инициализирован
         if (databaseWrapper.levels == null)
         {
@@ -54,6 +53,7 @@ public class LevelDatabase: SingletonBehaviour<LevelDatabase>
         // Всегда сохраняем все уровни
         string json = JsonUtility.ToJson(databaseWrapper, true);
         File.WriteAllText(filePath, json);
+        Debug.Log(filePath);
     }
 
     public int AddLevel(List<Vector2> points, List<List<Vector2>> cycles)
@@ -72,10 +72,10 @@ public class LevelDatabase: SingletonBehaviour<LevelDatabase>
 
         // Добавляем новый уровень к существующим
         databaseWrapper.levels.Add(newLevel);
-        
+
         // Сохраняем всю базу целиком
         SaveDatabase();
-        
+
         return newLevel.id;
     }
 
@@ -87,9 +87,9 @@ public class LevelDatabase: SingletonBehaviour<LevelDatabase>
         if (levelData == null) return (null, null);
 
         // Преобразование points
-        List<Vector2> points = levelData.points?.Select(p => p.ToVector2()).ToList() 
-                              ?? new List<Vector2>();
-        
+        List<Vector2> points = levelData.points?.Select(p => p.ToVector2()).ToList()
+                               ?? new List<Vector2>();
+
         // Преобразование cycles
         List<List<Vector2>> cycles = new List<List<Vector2>>();
         if (levelData.cycles != null)
@@ -117,9 +117,10 @@ public class LevelDatabase: SingletonBehaviour<LevelDatabase>
             SaveDatabase();
             return true;
         }
+
         return false;
     }
-    
+
     // Новый метод для получения всех ID уровней
     public List<int> GetAllLevelIds()
     {

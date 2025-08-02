@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using Project.Core.Scripts;
@@ -12,9 +13,9 @@ public class LineDrawerFromDotsManager : SingletonBehaviour<LineDrawerFromDotsMa
     [SerializeField] private Color lineColor = Color.white;
     [SerializeField] private int sortingOrder = 0;
 
-    private LineRenderer lineRenderer;
+    [SerializeField] private LineRenderer lineRenderer;
 
-    private void Awake()
+    public void Start()
     {
         InitializeLineRenderer();
     }

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class LevelLoaderButton : MonoBehaviour
 {
     [SerializeField] private Button _button;
-    [SerializeField] private TextMeshProUGUI _inputedInfo;
+    [SerializeField] private TMP_InputField _inputedInfo;
 
     private void Start()
     {
@@ -16,7 +16,9 @@ public class LevelLoaderButton : MonoBehaviour
 
     private void DrawLevel()
     {
-        var level = LevelDatabase.Instance.GetLevel(Convert.ToInt32(_inputedInfo.text)).points;
+        var text = _inputedInfo.text;
+        Debug.Log(text);
+        var level = LevelDatabase.Instance.GetLevel(Convert.ToInt32(text)).points;
         LineDrawerFromDotsManager.Instance.DrawLine(level);
     }
 }
