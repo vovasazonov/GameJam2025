@@ -7,7 +7,8 @@ public class TrainView : MonoBehaviour
 {
     [SerializeField] private float _carriageSpacing = 2.5f;
     [SerializeField] private float _speed = 5f;
-
+    [SerializeField] private float _rotationSpeed = 10f; // Adjust for smoothness
+    
     private CarriageView[] _carriages;
     private List<Vector2> _loopPath;
     private float _totalDistance;
@@ -44,8 +45,12 @@ public class TrainView : MonoBehaviour
                 Vector2 direction = (nextPos - pos).normalized;
                 if (direction.sqrMagnitude > 0.001f)
                 {
-                    _carriages[i].transform.rotation = Quaternion.LookRotation(direction, Vector3.back);
-                    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                    Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.back);
+                    _carriages[i].transform.rotation = Quaternion.Slerp(
+                        _carriages[i].transform.rotation,
+                        targetRotation,
+                        Time.deltaTime * _rotationSpeed
+                    );
                 }
             }
 
