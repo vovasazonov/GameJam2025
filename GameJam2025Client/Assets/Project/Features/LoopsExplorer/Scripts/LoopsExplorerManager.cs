@@ -15,14 +15,14 @@ namespace Project.Features.LoopsExplorer.Scripts
         [SerializeField] private LineRenderer _touchLineRenderer;
         [SerializeField] private LineRenderer _loopPrefab;
 
-        private readonly Dictionary<int, List<Vector2>> _allLoopsById = new();
-        private readonly HashSet<int> _foundLoopsIds = new();
-        private readonly List<Vector2> _fullLine = new();
+        private readonly Dictionary<int, List<Vector2>> _allLoopsById = new Dictionary<int, List<Vector2>>();
+        private readonly HashSet<int> _foundLoopsIds = new HashSet<int>();
+        private readonly List<Vector2> _fullLine = new List<Vector2>();
 
-        private readonly List<Vector2> _touchedPoints = new();
+        private readonly List<Vector2> _touchedPoints = new List<Vector2>();
         private bool _isDown;
 
-        private readonly List<LineRenderer> _foundLoops = new();
+        private readonly List<LineRenderer> _foundLoops = new List<LineRenderer>();
 
         public event Action<int> FoundLoop;
         public int TotalLoops => _allLoopsById.Count;
