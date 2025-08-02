@@ -59,6 +59,7 @@ namespace Project.Features.LoopsExplorer.Scripts
             }
 
             _foundLoops.ForEach(i => Destroy(i.gameObject));
+            _foundLoops.Clear();
             NewDataInitialized?.Invoke();
         }
 
