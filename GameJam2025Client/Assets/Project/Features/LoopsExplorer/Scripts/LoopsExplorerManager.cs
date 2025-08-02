@@ -12,9 +12,9 @@ namespace Project.Features.LoopsExplorer.Scripts
         [SerializeField] private float _radiusFinger = 10f;
         [SerializeField] private float _matchThreshold = 0.8f;
 
-        private readonly HashSet<int> _foundLoopsIds = new();
-        private List<Vector2> _fullLine = new();
-        private List<List<Vector2>> _toFindLoops = new();
+        private readonly HashSet<int> _foundLoopsIds = new HashSet<int>();
+        private List<Vector2> _fullLine = new List<Vector2>();
+        private List<List<Vector2>> _toFindLoops = new List<List<Vector2>>();
 
         private bool _isDown;
 
