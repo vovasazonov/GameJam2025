@@ -77,6 +77,7 @@ namespace Project.Features.LoopsExplorer.Scripts
                     _isDown = true;
                     _touchedPoints.Clear();
                     _touchesRail = RailsManager.Instance.CreateRails();
+                    _touchesRail.UpdateIncreaseScale(0.5f);
                 }
 
                 var inputPosition = InputManager.Instance.PointPosition;

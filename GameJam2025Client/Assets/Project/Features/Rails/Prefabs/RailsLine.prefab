@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lineOffset: 0.15
-  _distanceBetweenRail: 0.2
+  _distanceBetweenRail: 0.3
   _railPrefab: {fileID: 6598670252352922873, guid: 1c4d7bc5786ee4036a7ee37bd31f972e, type: 3}
   _leftLineRenderer: {fileID: 6092023933295735648}
   _rightLineRenderer: {fileID: 4083684153769759996}

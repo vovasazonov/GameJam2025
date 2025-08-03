@@ -15,6 +15,12 @@ namespace Project.Features.Rails.Scripts
         private Vector3 _lastRailPosition;
         private readonly List<Vector3> _allPositions = new List<Vector3>();
 
+        private float _scale;
+        public void UpdateIncreaseScale(float scale)
+        {
+            _scale = scale;
+        }
+        
         public void AddPosition(Vector3 position)
         {
             _allPositions.Add(position);
@@ -45,6 +51,7 @@ namespace Project.Features.Rails.Scripts
             if (_rails.Count == 0 || Vector3.Distance(_lastRailPosition, position) > _distanceBetweenRail)
             {
                 var rail = Instantiate(_railPrefab, transform);
+                rail.transform.localScale = new Vector3(rail.transform.localScale.x + _scale, rail.transform.localScale.y + _scale, rail.transform.localScale.z + _scale);
                 Vector3 direction = _leftLineRenderer.positionCount > 1
                     ? (_leftLineRenderer.GetPosition(_leftLineRenderer.positionCount - 1) - _leftLineRenderer.GetPosition(_leftLineRenderer.positionCount - 2)).normalized
                     : Vector3.zero;
