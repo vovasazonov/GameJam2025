@@ -1,7 +1,6 @@
-using System;
+using Project.Features.Cameras;
 using Project.Features.LoopsExplorer.Scripts;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class LoopCounter : MonoBehaviour
@@ -13,17 +12,22 @@ public class LoopCounter : MonoBehaviour
     void Start()
     {
         LoopsExplorerManager.Instance.FoundLoop += UpdateFoundLoopsDisplay;
+        LoopsExplorerManager.Instance.NewDataInitialized += OnNewData;
+        UpdateFoundLoopsDisplay(0);
+    }
+
+    private void OnNewData()
+    {
+        UpdateFoundLoopsDisplay(0);
     }
 
     private void UpdateFoundLoopsDisplay(int Zatichka)
     {
-        loopFoundDisplay.text = Convert.ToString(LoopsExplorerManager.Instance.FoundLoops) + " found from" + " " +
-                                LoopsExplorerManager.Instance.TotalLoops;
+        loopFoundDisplay.text = $"{LoopsExplorerManager.Instance.FoundLoops}/{LoopsExplorerManager.Instance.TotalLoops}";
 
         if (LoopsExplorerManager.Instance.FoundLoops == LoopsExplorerManager.Instance.TotalLoops)
         {
-            levelMenu.SetActive(false);
-            levelChoserMenu.SetActive(true);
+            CameraManager.Instance.Show();
         }
     }
 }
